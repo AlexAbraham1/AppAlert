@@ -1,5 +1,6 @@
 package io.appalert.appalert;
 
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.app.IntentService;
@@ -9,6 +10,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -27,12 +29,20 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by alexabraham on 10/3/14.
  */
-public class AppCheckService extends IntentService {
+public class AppCheckService extends Service {
 
     public static final String TAG = "AppCheckService";
 
-    public AppCheckService(){
-        super("AppCheckService");
+    public static boolean running;
+
+    public Handler handler = new Handler();
+
+    public Runnable runable;
+
+    @Override
+    public IBinder onBind(Intent arg0) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override
@@ -41,46 +51,36 @@ public class AppCheckService extends IntentService {
 
         Log.i(TAG, "Service Started");
 
-        final Handler h = new Handler();
+        running = true;
+
         final int delay = 10000; //milliseconds
 
-        h.postDelayed(new Runnable(){
+        runable = new Runnable(){
             public void run(){
-                //do something
 
-                String message = getCurrentRunningApp();
+                if (running) {
+                    if (isScreenOn()) {
 
-                if (message != null) {
-                    Log.i(TAG, message);
-                    showAlert(message);
-                } else {
-                    Log.i(TAG, "MESSAGE IS NULL");
+                        String message = getCurrentRunningApp();
+
+                        if (message != null) {
+                            Log.i(TAG, message);
+                            showAlert(message);
+                        } else {
+                            Log.i(TAG, "Message is null");
+                        }
+
+                    } else {
+                        Log.i(TAG, "Screen Is Off");
+                    }
+
+                    handler.postDelayed(this, delay);
                 }
-
-                h.postDelayed(this, delay);
             }
-        }, delay);
+        };
 
-//        ScheduledExecutorService scheduleTaskExecutor = Executors.newScheduledThreadPool(5);
-//
-//        scheduleTaskExecutor.scheduleAtFixedRate(new Runnable() {
-//            public void run() {
-//                String message = getCurrentRunningApp();
-//
-//                if (message != null) {
-//                    Log.i(TAG, message);
-//                    showAlert(message);
-//                } else {
-//                    Log.i(TAG, "MESSAGE IS NULL");
-//                }
-//            }
-//        }, 10, 10, TimeUnit.SECONDS);
+        handler.postDelayed(runable, delay);
 
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        Log.i(TAG, "Service Intent");
     }
 
     @Override
@@ -139,9 +139,26 @@ public class AppCheckService extends IntentService {
 
     }
 
+    @SuppressLint("NewApi") //SUPRESSED SINCE API CHECK IS BELOW
+    private boolean isScreenOn() {
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+
+        int version = Build.VERSION.SDK_INT;
+        if (version >= 20) {
+            return powerManager.isInteractive();
+        } else {
+            return powerManager.isScreenOn();
+        }
+    }
+
     @Override
     public void onDestroy() {
         Log.i(TAG, "Service Destroyed");
+
+        handler.removeCallbacks(runable);
+
+        running = false;
+        super.onDestroy();
     }
 
 }

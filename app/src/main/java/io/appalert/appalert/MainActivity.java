@@ -136,14 +136,14 @@ public class MainActivity extends Activity {
     private void checkServiceState() {
 
         if (toggleAlerts.isChecked()) {
-            Intent startServiceIntent = new Intent(MainActivity.this.getApplicationContext(), AppCheckService.class);
-            MainActivity.this.getApplicationContext().startService(startServiceIntent);
+            Intent startServiceIntent = new Intent(MainActivity.this, AppCheckService.class);
+            startService(startServiceIntent);
 
             Log.i(TAG, "Starting Service from MainActivity");
         } else {
-            Intent stopServiceIntent = new Intent(MainActivity.this.getApplicationContext(), AppCheckService.class);
-            MainActivity.this.getApplicationContext().stopService(stopServiceIntent);
-            Log.i(TAG, "Stopping Service from Intent");
+            Intent stopServiceIntent = new Intent(MainActivity.this, AppCheckService.class);
+            stopService(stopServiceIntent);
+            Log.i(TAG, "Stopping Service from MainActivity");
         }
 
     }
