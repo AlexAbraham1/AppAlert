@@ -3,9 +3,7 @@ package io.appalert.appalert;
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.AlertDialog;
-import android.app.IntentService;
 import android.app.Service;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,20 +11,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.IBinder;
-import android.os.Looper;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by alexabraham on 10/3/14.
@@ -125,20 +117,37 @@ public class AppCheckService extends Service {
     }
 
     public void showAlert(String name) {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AppCheckService.this);
 
-        alertDialogBuilder.setTitle("Current Running App");
+        QustomDialogBuilder dialogBuilder = new QustomDialogBuilder(AppCheckService.this).
+                setTitle("Current Running App").
+                setTitleColor("#ff0000").
+                setDividerColor("#ff0000").
+                setMessage(name);
 
-        alertDialogBuilder.setMessage(name);
-
-        alertDialogBuilder.setNeutralButton("OK",new DialogInterface.OnClickListener() {
+        dialogBuilder.setNeutralButton("OK",new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog,int id) {
 
             }
         });
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
-        alertDialog.show();
+
+        AlertDialog dialog = dialogBuilder.create();
+        dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+        dialog.show();
+
+//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(AppCheckService.this);
+//
+//        alertDialogBuilder.setTitle("Current Running App");
+//
+//        alertDialogBuilder.setMessage(name);
+//
+//        alertDialogBuilder.setNeutralButton("OK",new DialogInterface.OnClickListener() {
+//            public void onClick(DialogInterface dialog,int id) {
+//
+//            }
+//        });
+//        AlertDialog alertDialog = alertDialogBuilder.create();
+//        alertDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+//        alertDialog.show();
 
     }
 

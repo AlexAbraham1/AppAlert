@@ -5,4 +5,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
+
+    <string name="main_button_text">See a new custom dialog!</string>
+    <string name="alert_image_content_description">Alert Image</string>
+
 </resources>
