@@ -8,6 +8,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Build;
@@ -16,6 +17,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
@@ -52,6 +54,7 @@ public class AppCheckService extends Service {
         Log.i(TAG, "Service Started");
 
         running = true;
+        saveBooleanPreference("AppCheckServiceRunning", running);
 
         final int delay = 10000; //milliseconds
 
@@ -158,7 +161,21 @@ public class AppCheckService extends Service {
         handler.removeCallbacks(runable);
 
         running = false;
+        saveBooleanPreference("AppCheckServiceRunning", running);
+
         super.onDestroy();
+    }
+
+    private void saveBooleanPreference(String name, boolean value) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(name, value);
+        editor.commit();
+    }
+
+    private boolean loadBooleanPreference(String name, boolean defaultvalue) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        return  preferences.getBoolean(name, defaultvalue);
     }
 
 }
